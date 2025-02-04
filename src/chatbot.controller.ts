@@ -2,21 +2,33 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { ChatbotService } from './chatbot.service';
 
 /**
- * Controller to handle chatbot-related API requests.
+ * Controller for AI-powered content summarization and SEO suggestions.
  */
-@Controller('chat')
+@Controller('chatbot')
 export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 
   /**
-   * POST endpoint to interact with the chatbot.
-   *
-   * @param message - The user's input message.
-   * @returns The AI-generated response.
+   * Endpoint to summarize an article.
+   * @param {string} text - The article text to summarize.
+   * @returns {Promise<{ summary: string }>} - The summarized text.
    */
-  @Post()
-  async chat(@Body('message') message: string): Promise<{ reply: string }> {
-    const reply = await this.chatbotService.chatWithAI(message);
-    return { reply };
+  @Post('summarize')
+  async summarize(@Body('text') text: string): Promise<{ summary: string }> {
+    const summary = await this.chatbotService.summarizeText(text);
+    return { summary };
+  }
+
+  /**
+   * Endpoint to extract SEO-friendly keywords from an article.
+   * @param {string} text - The article text to analyze.
+   * @returns {Promise<{ keywords: string[] }>} - Extracted keywords.
+   */
+  @Post('keywords')
+  async extractKeywords(
+    @Body('text') text: string,
+  ): Promise<{ keywords: string[] }> {
+    const keywords = await this.chatbotService.extractKeywords(text);
+    return { keywords };
   }
 }
