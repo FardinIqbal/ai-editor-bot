@@ -13,16 +13,20 @@ import { Summary } from './entities/summary.entity';
  */
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Load environment variables from .env
+    ConfigModule.forRoot({
+      isGlobal: true, // Ensures ConfigModule is available throughout the app
+      envFilePath: ['.env'], // Load environment variables from .env file
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL, // PostgreSQL connection string
-      autoLoadEntities: true, // Automatically load entities
-      synchronize: true, // Set to false in production to avoid schema overwrites
+      autoLoadEntities: true, // Automatically loads all entity files
+      synchronize: process.env.NODE_ENV !== 'production', // Set to false in production to avoid schema overwrites
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // Enables SSL for secure DB connections
     }),
-    TypeOrmModule.forFeature([Summary]), // Register entity for repository usage
+    TypeOrmModule.forFeature([Summary]), // Registers the Summary entity for repository access
   ],
-  controllers: [AppController, ChatbotController], // Register controllers
-  providers: [AppService, ChatbotService], // Register services
+  controllers: [AppController, ChatbotController], // Registers application controllers
+  providers: [AppService, ChatbotService], // Registers services
 })
 export class AppModule {}
